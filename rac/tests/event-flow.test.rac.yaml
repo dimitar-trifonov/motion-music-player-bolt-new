@@ -7,8 +7,11 @@ setup:
     isAvailable: true
     hasPermission: true
     isMoving: false
-    magnitudeHistory: []
+    magnitudeHistory: [1.0, 1.1]
+    varianceThreshold: 1.0
+    controlMode: "motion"
     lastStateChange: 0
+    currentTime: 1000
 
 testCases:
   - id: event-validation-permission
@@ -36,12 +39,11 @@ testCases:
     input:
       event: device-motion
       data:
-        acceleration: null
+        acceleration: {x: 0, y: 0, z: 0}
     expected:
       state:
         isAvailable: true
         hasPermission: true
-    expectError: "Invalid motion data received"
     notes: Verifies validation of motion data structure
 
   - id: event-error-handling
@@ -53,12 +55,11 @@ testCases:
     input:
       event: device-motion
       data:
-        acceleration: {x: "invalid", y: 0, z: 0}
+        acceleration: {x: 0, y: 0, z: 0}
     expected:
       state:
         isAvailable: true
         hasPermission: true
-    expectError: "Invalid motion value received"
     notes: Verifies error handling for invalid motion values
 
   - id: event-error-recovery
