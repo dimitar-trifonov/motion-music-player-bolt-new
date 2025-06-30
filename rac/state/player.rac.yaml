@@ -1,0 +1,42 @@
+id: player.state
+version: 1.0
+type: object
+description: Player state including playback status and current track
+fields:
+  - name: isPlaying
+    type: boolean
+    required: true
+    description: Current playback state
+  - name: currentTrackId
+    type: string
+    required: true
+    description: ID of the currently playing track
+  - name: currentTime
+    type: number
+    required: true
+    description: Current playback position in seconds
+  - name: autoAdvance
+    type: boolean
+    required: true
+    description: Whether to automatically advance to next track
+  - name: isLoading
+    type: boolean
+    required: true
+    description: Whether a track is currently loading
+  - name: controlMode
+    type: enum
+    values: [motion, manual]
+    required: true
+    default: manual
+    description: Current control mode (motion or manual)
+  - name: isManualControlEnabled
+    type: boolean
+    required: true
+    default: true
+    description: Whether manual control is enabled
+access:
+  read: public
+  write: motion-detected
+metadata:
+  createdBy: system
+  tags: [player, playback, track] 

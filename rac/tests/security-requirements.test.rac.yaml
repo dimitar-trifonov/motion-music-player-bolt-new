@@ -1,0 +1,113 @@
+id: security-requirements.test
+version: 1.0
+description: Test cases for security requirements, focusing on SSL validation
+
+setup:
+  window:
+    isSecureContext: false
+    location:
+      protocol: "http:"
+      hostname: "example.com"
+
+testCases:
+  - id: test-ssl-requirement-secure-context
+    description: Verify SSL requirement in secure context
+    setup:
+      window:
+        isSecureContext: true
+        location:
+          protocol: "https:"
+          hostname: "example.com"
+    input:
+      event: "validate-security"
+      data:
+        feature: "motion-detection"
+    expected:
+      isValid: true
+      error: null
+    notes: "Verifies that motion detection is allowed in a secure HTTPS context"
+    expectError: null
+
+  - id: test-ssl-requirement-insecure-context
+    description: Verify SSL requirement in insecure context
+    setup:
+      window:
+        isSecureContext: false
+        location:
+          protocol: "http:"
+          hostname: "example.com"
+    input:
+      event: "validate-security"
+      data:
+        feature: "motion-detection"
+    expected:
+      isValid: false
+      error: "Device Motion API requires a secure context (HTTPS)"
+    notes: "Verifies that motion detection is blocked in an insecure HTTP context"
+    expectError: "Device Motion API requires a secure context (HTTPS)"
+
+  - id: test-localhost-exception
+    description: Verify localhost exception for development
+    setup:
+      window:
+        isSecureContext: false
+        location:
+          protocol: "http:"
+          hostname: "localhost"
+    input:
+      event: "validate-security"
+      data:
+        feature: "motion-detection"
+    expected:
+      isValid: true
+      error: null
+    notes: "Verifies that motion detection is allowed on localhost without HTTPS for development"
+    expectError: null
+
+  - id: test-motion-permission-granted
+    description: Verify motion permission when granted
+    setup:
+      window:
+        isSecureContext: true
+        location:
+          protocol: "https:"
+          hostname: "example.com"
+      permission:
+        state: "granted"
+    input:
+      event: "validate-security"
+      data:
+        feature: "motion-detection"
+    expected:
+      isValid: true
+      error: null
+    notes: "Verifies that motion detection works when permission is granted"
+    expectError: null
+
+  - id: test-motion-permission-denied
+    description: Verify motion permission when denied
+    setup:
+      window:
+        isSecureContext: true
+        location:
+          protocol: "https:"
+          hostname: "example.com"
+      permission:
+        state: "denied"
+    input:
+      event: "validate-security"
+      data:
+        feature: "motion-detection"
+    expected:
+      isValid: false
+      error: "Motion detection permission required"
+    notes: "Verifies that motion detection is blocked when permission is denied"
+    expectError: "Motion detection permission required"
+
+metadata:
+  createdBy: RaC
+  tags:
+    - security
+    - ssl
+    - motion
+    - permissions 

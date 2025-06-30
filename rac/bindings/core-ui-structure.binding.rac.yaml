@@ -1,0 +1,170 @@
+id: core-ui-structure
+version: 1.0
+type: binding
+tech: react-tailwind
+description: Core UI Structure binding for the motion-controlled music player
+
+metadata:
+  createdBy: RaC
+  tags:
+    - ui
+    - layout
+    - theme
+    - components
+
+mappings:
+  - source: layout.structure
+    target: react.components
+    strategy: component-hierarchy
+
+  - source: layout.responsive
+    target: tailwind.breakpoints
+    strategy: responsive-utilities
+
+  - source: theme.colors
+    target: tailwind.colors
+    strategy: color-palette
+
+  - source: theme.typography
+    target: tailwind.typography
+    strategy: text-utilities
+
+  - source: theme.spacing
+    target: tailwind.spacing
+    strategy: spacing-utilities
+
+  - source: components.patterns
+    target: react.components
+    strategy: component-patterns
+
+layout:
+  structure:
+    - type: container
+      id: app-container
+      children:
+        - type: section
+          id: motion-status
+          role: status
+          layout: flex
+          direction: column
+          spacing: medium
+        - type: section
+          id: player-status
+          role: status
+          layout: flex
+          direction: column
+          spacing: medium
+        - type: section
+          id: player-controls
+          role: controls
+          layout: flex
+          direction: column
+          spacing: medium
+
+  responsive:
+    breakpoints:
+      - name: sm
+        width: 640
+      - name: md
+        width: 768
+      - name: lg
+        width: 1024
+      - name: xl
+        width: 1280
+    mobile-first: true
+
+theme:
+  colors:
+    primary: "#3B82F6"
+    secondary: "#10B981"
+    background: "#FFFFFF"
+    text: "#1F2937"
+    error: "#EF4444"
+    success: "#10B981"
+    warning: "#F59E0B"
+
+  typography:
+    scale:
+      - name: xs
+        size: 0.75rem
+      - name: sm
+        size: 0.875rem
+      - name: base
+        size: 1rem
+      - name: lg
+        size: 1.125rem
+      - name: xl
+        size: 1.25rem
+      - name: 2xl
+        size: 1.5rem
+
+  spacing:
+    scale:
+      - name: xs
+        size: 0.25rem
+      - name: sm
+        size: 0.5rem
+      - name: md
+        size: 1rem
+      - name: lg
+        size: 1.5rem
+      - name: xl
+        size: 2rem
+      - name: 2xl
+        size: 3rem
+
+components:
+  patterns:
+    - name: card
+      structure:
+        - type: container
+          layout: flex
+          direction: column
+          padding: medium
+          border: true
+          rounded: true
+          shadow: true
+
+    - name: button
+      structure:
+        - type: button
+          padding: small
+          rounded: true
+          states:
+            - name: default
+              background: primary
+              text: white
+            - name: hover
+              background: primary-dark
+            - name: disabled
+              opacity: 0.5
+
+    - name: status-indicator
+      structure:
+        - type: container
+          layout: flex
+          direction: row
+          align: center
+          spacing: small
+          states:
+            - name: active
+              color: success
+            - name: inactive
+              color: error
+            - name: loading
+              color: warning
+
+    - name: slider
+      structure:
+        - type: container
+          layout: flex
+          direction: column
+          spacing: small
+        - type: input
+          type: range
+          padding: small
+          states:
+            - name: default
+              color: primary
+            - name: disabled
+              opacity: 0.5 

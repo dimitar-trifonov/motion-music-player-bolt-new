@@ -1,0 +1,344 @@
+id: motion-detection.events
+version: 1.0
+type: object
+description: Events for motion detection system
+events:
+  - id: motion-component-mount
+    type: system
+    description: Handles component mount initialization
+    triggers:
+      - source:
+          type: system
+          name: component-mount
+        componentId: motion-status
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-availability
+            onError: continue
+          - logic: validate-secure-context
+            onError: continue
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isAvailable
+          - hasPermission
+          - controlMode
+          - isMoving
+          - magnitudeHistory
+    metadata:
+      createdBy: system
+      tags: [motion, lifecycle, mount]
+
+  - id: motion-component-unmount
+    type: system
+    description: Handles component cleanup on unmount
+    triggers:
+      - source:
+          type: system
+          name: component-unmount
+        componentId: motion-status
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-control-mode
+            onError: continue
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - magnitudeHistory
+          - isMoving
+          - controlMode
+    metadata:
+      createdBy: system
+      tags: [motion, lifecycle, unmount]
+
+  - id: motion-permission-button-click
+    type: user
+    description: Handles permission button click interaction
+    triggers:
+      - source:
+          type: user
+          name: button-click
+        componentId: permission-button
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-availability
+            onError: halt
+          - logic: validate-secure-context
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - hasPermission
+          - isAvailable
+    metadata:
+      createdBy: system
+      tags: [motion, permission, user-interaction]
+
+  - id: motion-sensitivity-change
+    type: user
+    description: Handles sensitivity slider value change
+    triggers:
+      - source:
+          type: user
+          name: slider-change
+        componentId: sensitivity-slider
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-threshold
+            onError: halt
+          - logic: validate-control-mode
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - varianceThreshold
+    metadata:
+      createdBy: system
+      tags: [motion, sensitivity, user-interaction]
+
+  - id: initialize-device-motion
+    type: system
+    description: Initializes motion detection system and checks device capability
+    triggers:
+      - source:
+          type: system
+          name: device-motion-initialize
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-availability
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isAvailable
+    metadata:
+      createdBy: system
+      tags: [motion, initialization]
+
+  - id: request-motion-permission
+    type: user
+    description: Handles user's response to motion permission request
+    triggers:
+      - source:
+          type: user
+          name: permission-response
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-permission
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - hasPermission
+    metadata:
+      createdBy: system
+      tags: [motion, permission]
+
+  - id: motion-permission-error
+    type: system
+    description: Handles errors during motion permission request
+    triggers:
+      - source:
+          type: system
+          name: permission-error
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-error
+            onError: continue
+          - logic: validate-motion-availability
+            onError: continue
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - hasPermission
+          - isAvailable
+          - isMoving
+          - controlMode
+    metadata:
+      createdBy: system
+      tags: [motion, permission, error]
+
+  - id: device-motion-detected
+    type: system
+    description: Event triggered when device motion is detected
+    triggers:
+      - source:
+          type: system
+          name: device-motion
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-history
+            onError: halt
+          - logic: validate-motion-threshold
+            onError: halt
+          - logic: validate-state-change
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isMoving
+          - lastStateChange
+    metadata:
+      createdBy: system
+      tags: [motion, detection]
+
+  - id: motion-state-changed
+    type: system
+    description: Event triggered when motion state changes
+    triggers:
+      - source:
+          type: system
+          name: state-change
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-state-change
+            onError: halt
+          - logic: validate-control-mode
+            onError: halt
+          - logic: validate-motion-history
+            onError: continue
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isMoving
+          - lastStateChange
+          - magnitudeHistory
+    metadata:
+      createdBy: system
+      tags: [motion, state]
+
+  - id: update-control-mode
+    type: user
+    description: Updates the control mode between manual and motion
+    triggers:
+      - source:
+          type: user
+          name: mode-switch
+        componentId: mode-switch-button
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-control-mode
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - controlMode
+    metadata:
+      createdBy: system
+      tags: [motion, control-mode, user-interaction]
+
+  - id: update-motion-sensitivity
+    type: user
+    description: Updates the motion detection sensitivity
+    triggers:
+      - source:
+          type: user
+          name: sensitivity-update
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-threshold
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - varianceThreshold
+    metadata:
+      createdBy: system
+      tags: [motion, sensitivity, user-interaction]
+
+  - id: clear-motion-history
+    type: system
+    description: Clears motion history when exiting motion mode
+    triggers:
+      - source:
+          type: system
+          name: mode-exit
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-control-mode
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - magnitudeHistory
+    metadata:
+      createdBy: system
+      tags: [motion, cleanup]
+
+  - id: motion-detection-error
+    type: system
+    description: Handles errors during motion detection
+    triggers:
+      - source:
+          type: system
+          name: detection-error
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-motion-error
+            onError: continue
+          - logic: validate-control-mode
+            onError: continue
+          - logic: validate-motion-availability
+            onError: continue
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isMoving
+          - hasPermission
+          - controlMode
+          - magnitudeHistory
+          - isAvailable
+    metadata:
+      createdBy: system
+      tags: [motion, error]
+
+  - id: validate-security
+    type: system
+    description: Validates that the Device Motion API is available in a secure context (HTTPS or localhost)
+    triggers:
+      - source:
+          type: system
+          name: security-check
+    logicChecks:
+      - type: and
+        checks:
+          - logic: validate-secure-context
+            onError: halt
+    actions:
+      - type: update
+        state: motion.state
+        fields:
+          - isAvailable
+    metadata:
+      createdBy: system
+      tags: [motion, security]
+
+metadata:
+  createdBy: system
+  tags: [motion, detection, events] 

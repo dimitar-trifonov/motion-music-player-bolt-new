@@ -1,0 +1,15 @@
+id: motion-detection.binding
+version: 1.0
+type: object
+tech: motion-detection
+mappings:
+  - source: motion.state
+    target: motion-detection-state
+    strategy: variance-based-detection
+  - source: motion.logic
+    target: motion-detection-logic
+    strategy: validation-rules
+metadata:
+  createdBy: system
+  tags: [motion, detection, algorithm]
+  notes: "Binding specification for variance-based motion detection algorithm" 

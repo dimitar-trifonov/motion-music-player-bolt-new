@@ -1,0 +1,359 @@
+id: player-control.events
+version: 1.0
+type: object
+description: Events for controlling player based on motion
+events:
+  - id: start-playback
+    type: system
+    description: Starts audio playback when motion is detected and all conditions are met
+    triggers:
+      - source:
+          type: system
+          name: motion-detected
+    logicChecks:
+      - type: and
+        checks:
+          - logic: motion-validation.logic#validate-motion-state
+            onError: halt
+          - logic: player-control.logic#validate-track-loaded
+            onError: halt
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: true
+          - isLoading: false
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: stop-playback
+    type: system
+    description: Stops audio playback when motion stops and mode switch is valid
+    triggers:
+      - source:
+          type: system
+          name: motion-stopped
+    logicChecks:
+      - type: and
+        checks:
+          - logic: motion-validation.logic#validate-motion-state
+            onError: halt
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: false
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: load-track
+    type: system
+    description: Initiates track loading when a new track is selected by the user
+    triggers:
+      - source:
+          type: user
+          name: track-selected
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-track-selection
+            onError: halt
+          - logic: player-control.logic#validate-track-loading
+            onError: continue
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - currentTrackId: selectedTrackId
+          - isLoading: true
+          - currentTime: 0
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: track-loaded
+    type: system
+    description: Handles successful track loading and updates player state
+    triggers:
+      - source:
+          type: system
+          name: track-loaded
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-loading-state
+            onError: halt
+          - logic: player-control.logic#validate-track-duration
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isLoading: false
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: update-playback-position
+    type: system
+    description: Updates the current playback position during track playback
+    triggers:
+      - source:
+          type: system
+          name: playback-progress
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-playback-state
+            onError: halt
+          - logic: player-control.logic#validate-track-loaded
+            onError: halt
+          - logic: player-control.logic#validate-playback-position
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - currentTime: newPosition
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: track-ended
+    type: system
+    description: Handles the end of track playback, resetting player state
+    triggers:
+      - source:
+          type: system
+          name: playback-ended
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - currentTime: 0
+          - isPlaying: false
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: advance-to-next-track
+    type: system
+    description: Automatically advances to the next track when current track ends, or to the first track if it's the last track
+    triggers:
+      - source:
+          type: system
+          name: track-ended
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-auto-advance
+            onError: continue
+          - logic: player-control.logic#validate-next-track
+            onError: continue
+          - logic: player-control.logic#validate-playlist-has-tracks
+            onError: continue
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - currentTrackId: nextTrackId || firstTrackId
+          - isLoading: true
+          - currentTime: 0
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: update-volume
+    type: user
+    description: Updates the player volume based on user input
+    triggers:
+      - source:
+          type: user
+          name: volume-change
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-volume-level
+            onError: halt
+    actions:
+      - type: update
+        state: volume.state
+        fields:
+          - level: newVolume
+    metadata:
+      createdBy: system
+      tags: [player, volume]
+
+  - id: seek-position
+    type: user
+    description: Seeks to a specific position in the current track
+    triggers:
+      - source:
+          type: user
+          name: seek-request
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-track-loaded
+            onError: halt
+          - logic: player-control.logic#validate-track-duration
+            onError: halt
+          - logic: player-control.logic#validate-seek-position
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - currentTime: seekPosition
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: handle-playback-error
+    type: system
+    description: Handles playback errors and resets player state
+    triggers:
+      - source:
+          type: system
+          name: error
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-track-loaded
+            onError: continue
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: false
+          - isLoading: false
+          - currentTime: 0
+    metadata:
+      createdBy: system
+      tags: [player, error]
+
+  - id: handle-track-load-error
+    type: system
+    description: Handles track loading errors and resets player state
+    triggers:
+      - source:
+          type: system
+          name: error
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isLoading: false
+          - currentTrackId: null
+          - currentTime: 0
+    metadata:
+      createdBy: system
+      tags: [player, error]
+
+  - id: reset-player-state
+    type: system
+    description: Resets all player state to initial values
+    triggers:
+      - source:
+          type: system
+          name: reset-request
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: false
+          - isLoading: false
+          - currentTrackId: null
+          - currentTime: 0
+          - trackDuration: 0
+    metadata:
+      createdBy: system
+      tags: [player, state]
+
+  - id: switch-to-manual
+    type: user
+    description: Switches player control from motion to manual mode
+    triggers:
+      - source:
+          type: user
+          name: mode-switch
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isManualMode: true
+    metadata:
+      createdBy: system
+      tags: [player, mode]
+
+  - id: switch-to-motion
+    type: user
+    description: Switches player control from manual to motion mode
+    triggers:
+      - source: mode-switch
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - controlMode: motion
+          - isManualControlEnabled: false
+    metadata:
+      createdBy: system
+      tags: [player, control]
+
+  - id: manual-play
+    type: user
+    description: Initiates playback when play button is clicked in manual mode
+    triggers:
+      - source: play-button-click
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+          - logic: player-control.logic#validate-track-loaded
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: true
+          - isLoading: false
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: manual-pause
+    type: user
+    description: Pauses playback when pause button is clicked in manual mode
+    triggers:
+      - source: pause-button-click
+    logicChecks:
+      - type: and
+        checks:
+          - logic: player-control.logic#validate-mode-switch
+            onError: halt
+    actions:
+      - type: update
+        state: player.state
+        fields:
+          - isPlaying: false
+    metadata:
+      createdBy: system
+      tags: [player, playback] 

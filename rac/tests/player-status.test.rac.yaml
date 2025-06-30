@@ -1,0 +1,147 @@
+id: player-status.test
+version: 1.1
+description: Tests for player status component
+
+setup:
+  player:
+    isPlaying: false
+    isLoading: false
+    currentTrackId: null
+  playlist:
+    tracks:
+      - id: "track1"
+        name: "Test Track 1"
+        artist: "Test Artist 1"
+        duration: "3:30"
+        file: "track1.mp3"
+
+testCases:
+  - id: initial-state
+    description: Test initial component state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: null
+    input:
+      event: mount
+      data:
+        component: player-status
+    expected:
+      title: ""
+      artist: ""
+      playbackState: "paused"
+      loadingState: "loaded"
+    notes: Verifies correct initial state when no track is loaded
+
+  - id: track-loaded
+    description: Test track loaded state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+    input:
+      event: track-loaded
+      data:
+        trackId: "track1"
+    expected:
+      title: "Test Track 1"
+      artist: "Test Artist 1"
+      playbackState: "paused"
+      loadingState: "loaded"
+    notes: Verifies correct state when track is loaded
+
+  - id: playback-started
+    description: Test playback started state
+    setup:
+      player:
+        isPlaying: true
+        isLoading: false
+        currentTrackId: "track1"
+    input:
+      event: playback-started
+      data:
+        trackId: "track1"
+    expected:
+      title: "Test Track 1"
+      artist: "Test Artist 1"
+      playbackState: "playing"
+      loadingState: "loaded"
+    notes: Verifies correct state when playback starts
+
+  - id: playback-paused
+    description: Test playback paused state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+    input:
+      event: playback-paused
+      data:
+        trackId: "track1"
+    expected:
+      title: "Test Track 1"
+      artist: "Test Artist 1"
+      playbackState: "paused"
+      loadingState: "loaded"
+    notes: Verifies correct state when playback is paused
+
+  - id: track-loading
+    description: Test track loading state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: true
+        currentTrackId: "track1"
+    input:
+      event: track-loading
+      data:
+        trackId: "track1"
+    expected:
+      title: "Test Track 1"
+      artist: "Test Artist 1"
+      playbackState: "paused"
+      loadingState: "loading"
+    notes: Verifies correct state during track loading
+
+  - id: track-load-error
+    description: Test track load error state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: null
+    input:
+      event: track-load-error
+      data:
+        error: "Failed to load track"
+    expected:
+      title: ""
+      artist: ""
+      playbackState: "paused"
+      loadingState: "error"
+    notes: Verifies correct state when track loading fails
+
+  - id: track-ended
+    description: Test track ended state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: null
+    input:
+      event: track-ended
+      data:
+        trackId: "track1"
+    expected:
+      title: ""
+      artist: ""
+      playbackState: "paused"
+      loadingState: "loaded"
+    notes: Verifies correct state when track ends
+
+metadata:
+  createdBy: system
+  tags: [test, player, ui] 

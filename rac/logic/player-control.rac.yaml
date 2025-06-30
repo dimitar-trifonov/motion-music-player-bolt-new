@@ -1,0 +1,197 @@
+id: player-control.logic
+version: 1.0
+type: object
+description: Logic for player control operations
+appliesTo: player.state
+rules:
+  - id: validate-auto-advance
+    type: rule
+    condition: autoAdvance === true
+    error: "Auto-advance must be enabled"
+    guards:
+      - field: autoAdvance
+        type: boolean
+    effects:
+      - type: validate
+        field: autoAdvance
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: validate-seek-position
+    type: rule
+    condition: seekPosition >= 0 && seekPosition <= trackDuration
+    error: "Seek position must be within track duration"
+    guards:
+      - field: seekPosition
+        type: number
+      - field: trackDuration
+        type: number
+    effects:
+      - type: validate
+        field: seekPosition
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: validate-track-selection
+    type: rule
+    condition: selectedTrackId !== null && selectedTrackId !== undefined
+    error: "A track must be selected"
+    guards:
+      - field: selectedTrackId
+        type: string
+    effects:
+      - type: validate
+        field: selectedTrackId
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: validate-track-loading
+    type: rule
+    condition: selectedTrackId !== currentTrackId
+    error: "Selected track is already loaded"
+    guards:
+      - field: selectedTrackId
+        type: string
+      - field: currentTrackId
+        type: string
+    effects:
+      - type: validate
+        field: selectedTrackId
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: validate-loading-state
+    type: rule
+    condition: isLoading === true
+    error: "Track must be in loading state"
+    guards:
+      - field: isLoading
+        type: boolean
+    effects:
+      - type: validate
+        field: isLoading
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: validate-playback-state
+    type: rule
+    condition: !isLoading
+    error: "Playback cannot occur while loading"
+    guards:
+      - field: isLoading
+        type: boolean
+    effects:
+      - type: validate
+        field: isLoading
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: validate-playback-position
+    type: rule
+    condition: currentTime >= 0 && currentTime <= trackDuration
+    error: "Playback position must be within track duration"
+    guards:
+      - field: currentTime
+        type: number
+      - field: trackDuration
+        type: number
+    effects:
+      - type: validate
+        field: currentTime
+    metadata:
+      createdBy: system
+      tags: [player, playback]
+
+  - id: validate-volume-level
+    type: rule
+    condition: level >= 0 && level <= 1
+    error: "Volume level must be between 0 and 1"
+    guards:
+      - field: level
+        type: number
+    effects:
+      - type: validate
+        field: level
+    metadata:
+      createdBy: system
+      tags: [player, volume]
+
+  - id: validate-track-duration
+    type: rule
+    condition: trackDuration > 0
+    error: "Track duration must be greater than 0"
+    guards:
+      - field: trackDuration
+        type: number
+    effects:
+      - type: validate
+        field: trackDuration
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: validate-track-loaded
+    type: rule
+    condition: currentTrackId !== null && currentTrackId !== undefined
+    error: "No track is currently loaded"
+    guards:
+      - field: currentTrackId
+        type: string
+    effects:
+      - type: validate
+        field: currentTrackId
+    metadata:
+      createdBy: system
+      tags: [player, track]
+
+  - id: validate-next-track
+    type: validation
+    description: Validates that there is a next track available
+    conditions:
+      - type: and
+        checks:
+          - type: exists
+            field: nextTrackId
+            value: true
+    errorMessage: No next track available
+
+  - id: validate-playlist-has-tracks
+    type: validation
+    description: Validates that the playlist has at least one track
+    conditions:
+      - type: and
+        checks:
+          - type: exists
+            field: playlist
+            value: true
+          - type: greaterThan
+            field: playlist.tracks.length
+            value: 0
+    errorMessage: Playlist is empty
+
+  - id: validate-mode-switch
+    type: rule
+    condition: (controlMode === "motion" && !isManualControlEnabled) || (controlMode === "manual" && isManualControlEnabled)
+    error: "Invalid mode switch: manual control must match the selected mode"
+    guards:
+      - field: controlMode
+        type: enum
+        values: [motion, manual]
+      - field: isManualControlEnabled
+        type: boolean
+    effects:
+      - type: validate
+        fields: [controlMode, isManualControlEnabled]
+    metadata:
+      createdBy: system
+      tags: [player, control]
+
+metadata:
+  createdBy: system
+  tags: [player, control] 

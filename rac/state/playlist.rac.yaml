@@ -1,0 +1,33 @@
+id: playlist.state
+version: 1.0
+type: object
+description: Playlist state including track list
+fields:
+  - name: tracks
+    type: array
+    required: true
+    items:
+      type: object
+      fields:
+        - name: id
+          type: string
+          required: true
+          description: Unique identifier for the track
+        - name: name
+          type: string
+          required: true
+        - name: artist
+          type: string
+          required: true
+        - name: duration
+          type: string
+          required: true
+        - name: file
+          type: string
+          required: true
+access:
+  read: public
+  write: system
+metadata:
+  createdBy: system
+  tags: [playlist, tracks] 

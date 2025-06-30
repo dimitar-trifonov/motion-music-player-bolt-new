@@ -1,0 +1,126 @@
+id: player-controls
+version: 1.1
+description: |
+  Player control interface component.
+  Provides playback controls, mode switching, volume control, and track navigation.
+  Supports both manual and motion control modes.
+  Updates in real-time based on player state changes.
+
+components:
+  - type: container
+    fields:
+      - name: onMount
+        type: function
+        description: Initializes player controls
+      - name: currentState
+        type: object
+        description: Current player state including playback and control mode
+      - name: currentTrack
+        type: object
+        description: Current track information
+    submitEvent: player-controls-mount
+
+  - type: button
+    fields:
+      - name: text
+        type: string
+        description: Play/Pause button text
+      - name: onClick
+        type: function
+        description: Handler for play/pause button clicks
+      - name: disabled
+        type: boolean
+        description: Whether the button is disabled
+    submitEvent: toggle-playback
+
+  - type: button
+    fields:
+      - name: text
+        type: string
+        description: Mode switch button text
+      - name: onClick
+        type: function
+        description: Handler for mode switch button clicks
+      - name: disabled
+        type: boolean
+        description: Whether the button is disabled
+    submitEvent: switch-mode
+
+  - type: slider
+    fields:
+      - name: value
+        type: number
+        description: Current volume level (0-1)
+      - name: onChange
+        type: function
+        description: Handler for volume changes
+      - name: disabled
+        type: boolean
+        description: Whether the slider is disabled
+    submitEvent: volume-change
+
+  - type: progress
+    fields:
+      - name: value
+        type: number
+        description: Current playback position in seconds
+      - name: max
+        type: number
+        description: Total track duration in seconds
+      - name: onChange
+        type: function
+        description: Handler for seeking
+      - name: disabled
+        type: boolean
+        description: Whether the progress bar is disabled
+    submitEvent: seek-position
+
+  - type: button
+    fields:
+      - name: text
+        type: string
+        description: Previous track button text
+      - name: onClick
+        type: function
+        description: Handler for previous track button clicks
+      - name: disabled
+        type: boolean
+        description: Whether the button is disabled
+    submitEvent: previous-track
+
+  - type: button
+    fields:
+      - name: text
+        type: string
+        description: Next track button text
+      - name: onClick
+        type: function
+        description: Handler for next track button clicks
+      - name: disabled
+        type: boolean
+        description: Whether the button is disabled
+    submitEvent: next-track
+
+  - type: checkbox
+    fields:
+      - name: checked
+        type: boolean
+        description: Whether auto-advance is enabled
+      - name: onChange
+        type: function
+        description: Handler for auto-advance toggle
+      - name: disabled
+        type: boolean
+        description: Whether the checkbox is disabled
+      - name: label
+        type: string
+        description: Label for the auto-advance checkbox
+    submitEvent: toggle-auto-advance
+
+views:
+  - path: /
+    layout: main
+
+metadata:
+  createdBy: system
+  tags: [player, controls, ui] 

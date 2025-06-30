@@ -1,0 +1,460 @@
+id: player-controls.test
+version: 1.1
+description: Tests for player controls component
+
+setup:
+  player:
+    isPlaying: false
+    isLoading: false
+    currentTrackId: null
+    controlMode: manual
+    isManualControlEnabled: true
+    currentTime: 0
+  playlist:
+    tracks:
+      - id: "track1"
+        name: "Test Track 1"
+        artist: "Test Artist 1"
+        duration: "3:30"
+        file: "track1.mp3"
+      - id: "track2"
+        name: "Test Track 2"
+        artist: "Test Artist 2"
+        duration: "4:15"
+        file: "track2.mp3"
+  volume:
+    level: 0.5
+
+testCases:
+  - id: initial-state
+    description: Test initial component state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: null
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: mount
+      data:
+        component: player-controls
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: true
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 0
+        disabled: true
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: true
+    notes: Verifies correct initial state when no track is loaded
+
+  - id: track-loaded
+    description: Test track loaded state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: track-loaded
+      data:
+        trackId: "track1"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: false
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 210
+        disabled: false
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: false
+    notes: Verifies correct state when track is loaded
+
+  - id: playback-started
+    description: Test playback started state
+    setup:
+      player:
+        isPlaying: true
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: playback-started
+      data:
+        trackId: "track1"
+    expected:
+      playPauseButton:
+        text: "Pause"
+        disabled: false
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 210
+        disabled: false
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: false
+    notes: Verifies correct state when playback starts
+
+  - id: playback-paused
+    description: Test playback paused state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: playback-paused
+      data:
+        trackId: "track1"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: false
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 210
+        disabled: false
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: false
+    notes: Verifies correct state when playback is paused
+
+  - id: mode-switched-to-motion
+    description: Test mode switch to motion
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: motion
+        isManualControlEnabled: false
+    input:
+      event: mode-switched
+      data:
+        mode: "motion"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: true
+      modeSwitchButton:
+        text: "Switch to Manual"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 210
+        disabled: false
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: false
+    notes: Verifies correct state after switching to motion mode
+
+  - id: mode-switched-to-manual
+    description: Test mode switch to manual
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: mode-switched
+      data:
+        mode: "manual"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: false
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 210
+        disabled: false
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: false
+    notes: Verifies correct state after switching to manual mode
+
+  - id: volume-changed
+    description: Test volume change
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+      volume:
+        level: 0.75
+    input:
+      event: volume-changed
+      data:
+        level: 0.75
+    expected:
+      volumeSlider:
+        value: 0.75
+        disabled: false
+    notes: Verifies correct state after volume change
+
+  - id: seek-position
+    description: Test seeking position
+    setup:
+      player:
+        isPlaying: true
+        isLoading: false
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+        currentTime: 60
+    input:
+      event: seek-position
+      data:
+        position: 60
+    expected:
+      progressBar:
+        value: 60
+        max: 210
+        disabled: false
+    notes: Verifies correct state after seeking position
+
+  - id: track-loading
+    description: Test track loading state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: true
+        currentTrackId: "track1"
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: track-loading
+      data:
+        trackId: "track1"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: true
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: true
+      volumeSlider:
+        value: 0.5
+        disabled: true
+      progressBar:
+        value: 0
+        max: 210
+        disabled: true
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: true
+    notes: Verifies correct state during track loading
+
+  - id: track-load-error
+    description: Test track load error state
+    setup:
+      player:
+        isPlaying: false
+        isLoading: false
+        currentTrackId: null
+        controlMode: manual
+        isManualControlEnabled: true
+    input:
+      event: track-load-error
+      data:
+        error: "Failed to load track"
+    expected:
+      playPauseButton:
+        text: "Play"
+        disabled: true
+      modeSwitchButton:
+        text: "Switch to Motion"
+        disabled: false
+      volumeSlider:
+        value: 0.5
+        disabled: false
+      progressBar:
+        value: 0
+        max: 0
+        disabled: true
+      previousTrackButton:
+        disabled: true
+      nextTrackButton:
+        disabled: true
+    notes: Verifies correct state when track loading fails
+
+  - id: test-auto-advance-to-first-track
+    description: Verifies that when the last track ends and auto-advance is enabled, it advances to the first track
+    setup:
+      - type: set
+        state: player.state
+        fields:
+          - autoAdvance: true
+          - currentTrackId: "track-3"
+          - isPlaying: true
+          - currentTime: 180
+      - type: set
+        state: playlist.state
+        fields:
+          - tracks:
+              - id: "track-1"
+                title: "First Track"
+                artist: "Artist 1"
+                duration: "180"
+                url: "https://example.com/track1.mp3"
+              - id: "track-2"
+                title: "Second Track"
+                artist: "Artist 2"
+                duration: "180"
+                url: "https://example.com/track2.mp3"
+              - id: "track-3"
+                title: "Last Track"
+                artist: "Artist 3"
+                duration: "180"
+                url: "https://example.com/track3.mp3"
+    trigger:
+      type: system
+      name: track-ended
+    expectedState:
+      - type: and
+        checks:
+          - type: equals
+            field: player.state.currentTrackId
+            value: "track-1"
+          - type: equals
+            field: player.state.isPlaying
+            value: true
+          - type: equals
+            field: player.state.currentTime
+            value: 0
+          - type: equals
+            field: player.state.isLoading
+            value: false
+
+  - id: test-auto-advance-disabled-last-track
+    description: Verifies that when the last track ends and auto-advance is disabled, it stops playback
+    setup:
+      - type: set
+        state: player.state
+        fields:
+          - autoAdvance: false
+          - currentTrackId: "track-3"
+          - isPlaying: true
+          - currentTime: 180
+      - type: set
+        state: playlist.state
+        fields:
+          - tracks:
+              - id: "track-1"
+                title: "First Track"
+                artist: "Artist 1"
+                duration: "180"
+                url: "https://example.com/track1.mp3"
+              - id: "track-2"
+                title: "Second Track"
+                artist: "Artist 2"
+                duration: "180"
+                url: "https://example.com/track2.mp3"
+              - id: "track-3"
+                title: "Last Track"
+                artist: "Artist 3"
+                duration: "180"
+                url: "https://example.com/track3.mp3"
+    trigger:
+      type: system
+      name: track-ended
+    expectedState:
+      - type: and
+        checks:
+          - type: equals
+            field: player.state.currentTrackId
+            value: "track-3"
+          - type: equals
+            field: player.state.isPlaying
+            value: false
+          - type: equals
+            field: player.state.currentTime
+            value: 180
+
+  - id: test-auto-advance-empty-playlist
+    description: Verifies that auto-advance doesn't trigger when the playlist is empty
+    setup:
+      - type: set
+        state: player.state
+        fields:
+          - autoAdvance: true
+          - currentTrackId: "track-1"
+          - isPlaying: true
+          - currentTime: 180
+      - type: set
+        state: playlist.state
+        fields:
+          - tracks: []
+    trigger:
+      type: system
+      name: track-ended
+    expectedState:
+      - type: and
+        checks:
+          - type: equals
+            field: player.state.currentTrackId
+            value: "track-1"
+          - type: equals
+            field: player.state.isPlaying
+            value: false
+          - type: equals
+            field: player.state.currentTime
+            value: 180
+
+metadata:
+  createdBy: system
+  tags: [test, player, controls, ui] 

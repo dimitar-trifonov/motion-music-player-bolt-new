@@ -1,0 +1,28 @@
+{
+  "tracks": [
+    {
+      "id": "1",
+      "title": "Track 1",
+      "artist": "Artist 1",
+      "cover": "/music/track1.png",
+      "file": "/music/track1.mp3",
+      "duration": 138
+    },
+    {
+      "id": "2",
+      "title": "Track 2",
+      "artist": "Artist 2",
+      "cover": "/music/track2.png",
+      "file": "/music/track2.mp3",
+      "duration": 190
+    },
+    {
+      "id": "3",
+      "title": "Track 3",
+      "artist": "Artist 3",
+      "cover": "/music/track3.png",
+      "file": "/music/track3.mp3",
+      "duration": 219
+    }
+  ]
+} 

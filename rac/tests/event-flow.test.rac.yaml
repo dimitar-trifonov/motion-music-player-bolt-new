@@ -1,0 +1,149 @@
+id: event-flow.test
+version: 1.0
+description: Tests for motion detection event flow, including validation, error handling, event chains, and priority
+
+setup:
+  motion.state:
+    isAvailable: true
+    hasPermission: true
+    isMoving: false
+    magnitudeHistory: []
+    lastStateChange: 0
+
+testCases:
+  - id: event-validation-permission
+    description: Verify event validation with permission requirements
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: false
+    input:
+      event: device-motion
+      data:
+        acceleration: {x: 1, y: 0, z: 0}
+    expected:
+      state:
+        hasPermission: false
+    expectError: "Motion detection permission required"
+    notes: Verifies that motion events are blocked without permission
+
+  - id: event-validation-data
+    description: Verify event validation for motion data
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: device-motion
+      data:
+        acceleration: null
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: true
+    expectError: "Invalid motion data received"
+    notes: Verifies validation of motion data structure
+
+  - id: event-error-handling
+    description: Verify error handling in event flow
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: device-motion
+      data:
+        acceleration: {x: "invalid", y: 0, z: 0}
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: true
+    expectError: "Invalid motion value received"
+    notes: Verifies error handling for invalid motion values
+
+  - id: event-error-recovery
+    description: Verify error recovery in event flow
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: device-motion
+      data:
+        acceleration: {x: 1, y: 0, z: 0}
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: true
+        isMoving: true
+    notes: Verifies system recovery after error
+
+  - id: event-chain-complete
+    description: Verify complete event chain from motion to UI
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+        isMoving: false
+    input:
+      event: device-motion
+      data:
+        acceleration: {x: 1, y: 0, z: 0}
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: true
+        isMoving: true
+    notes: Verifies complete event chain with timing
+
+  - id: event-chain-interrupted
+    description: Verify event chain interruption handling
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: permission-change
+      data:
+        granted: false
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: false
+    notes: Verifies event chain interruption handling
+
+  - id: event-priority
+    description: Verify event priority handling
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: permission-change
+      data:
+        granted: false
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: false
+    notes: Verifies event priority handling
+
+  - id: event-priority-conflict
+    description: Verify event priority conflict resolution
+    setup:
+      motion.state:
+        isAvailable: true
+        hasPermission: true
+    input:
+      event: permission-change
+      data:
+        granted: false
+    expected:
+      state:
+        isAvailable: true
+        hasPermission: false
+    notes: Verifies priority conflict resolution
+
+metadata:
+  createdBy: system
+  tags: [test, motion, events, flow] 

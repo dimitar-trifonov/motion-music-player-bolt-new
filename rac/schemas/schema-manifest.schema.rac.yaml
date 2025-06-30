@@ -1,0 +1,26 @@
+id: schema-manifest
+version: 1.0
+description: Central registry of RaC schema files for structure validation and tool coordination
+schemas:
+  - file: event.schema.rac.yaml
+    appliesTo: events/
+    description: Defines structure of RaC event declarations
+    version: 1.8
+  - file: logic.schema.rac.yaml
+    appliesTo: logic/
+    description: Rules, guards, and effects — strictly read-only
+    version: 1.1
+  - file: test.schema.rac.yaml
+    appliesTo: tests/
+    description: Validates event and logic flows via setup → input → expected
+    version: 1.1
+  - file: ui.schema.rac.yaml
+    appliesTo: ui/
+    description: Describes component-state bindings and visual flow anchors
+    version: 1.1
+
+---
+# 💡 NOTE: This schema structure is primarily optimized for frontend or full-stack applications.
+# In domain-specific RaC implementations (e.g. policy engines, agent orchestration, backend-only APIs),
+# folder names like `events/` may be replaced with `services/`, and `ui/` may become `api/` or be omitted entirely.
+# The RaC framework is intentionally flexible — schemas are modular and may vary per use case.

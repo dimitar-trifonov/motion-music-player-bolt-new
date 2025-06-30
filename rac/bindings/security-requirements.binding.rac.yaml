@@ -1,0 +1,91 @@
+id: security-requirements
+version: 1.0
+type: binding
+tech: web
+description: Security requirements binding for the motion-controlled music player
+
+metadata:
+  createdBy: RaC
+  tags:
+    - security
+    - ssl
+    - permissions
+    - motion
+
+mappings:
+  - source: security.requirements
+    target: web.security
+    strategy: security-patterns
+
+security:
+  requirements:
+    - name: ssl-requirement
+      type: requirement
+      description: Application must be served over HTTPS for Device Motion API
+      conditions:
+        - type: and
+          checks:
+            - type: equals
+              field: window.isSecureContext
+              value: true
+            - type: equals
+              field: window.location.protocol
+              value: "https:"
+      errorMessage: "Device Motion API requires a secure context (HTTPS)"
+      appliesTo:
+        - motion-detection
+        - device-orientation
+        - device-motion
+
+    - name: motion-permission
+      type: requirement
+      description: User must grant permission for motion detection
+      conditions:
+        - type: and
+          checks:
+            - type: equals
+              field: permission.state
+              value: "granted"
+      errorMessage: "Motion detection permission required"
+      appliesTo:
+        - motion-detection
+        - device-motion
+
+    - name: secure-origin
+      type: requirement
+      description: Application must be served from a secure origin
+      conditions:
+        - type: and
+          checks:
+            - type: equals
+              field: window.location.protocol
+              value: "https:"
+            - type: not
+              field: window.location.hostname
+              value: "localhost"
+      errorMessage: "Application must be served from a secure origin"
+      appliesTo:
+        - motion-detection
+        - device-orientation
+        - device-motion
+
+    - name: localhost-exception
+      type: exception
+      description: Localhost is allowed for development without HTTPS
+      conditions:
+        - type: and
+          checks:
+            - type: equals
+            field: window.location.hostname
+            value: "localhost"
+            - type: equals
+            field: window.location.protocol
+            value: "http:"
+      appliesTo:
+        - motion-detection
+        - device-orientation
+        - device-motion
+
+metadata:
+  createdBy: system
+  tags: [security, ssl, motion] 

@@ -1,0 +1,39 @@
+id: motion.state
+version: 1.0
+type: object
+description: State for motion detection system
+fields:
+  - name: isAvailable
+    type: boolean
+    required: true
+    description: Whether device motion detection is available
+  - name: hasPermission
+    type: boolean
+    required: true
+    description: Whether motion detection permission is granted
+  - name: isMoving
+    type: boolean
+    required: true
+    description: Whether the device is currently moving
+  - name: controlMode
+    type: string
+    required: true
+    description: Current control mode (manual or motion)
+  - name: magnitudeHistory
+    type: array
+    required: true
+    description: History of motion magnitude values
+  - name: varianceThreshold
+    type: number
+    required: true
+    description: Threshold for motion variance detection
+  - name: lastStateChange
+    type: number
+    required: true
+    description: Timestamp of last motion state change
+access:
+  read: public
+  write: system
+metadata:
+  createdBy: system
+  tags: [motion, detection, variance] 

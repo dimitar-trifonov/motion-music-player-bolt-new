@@ -1,0 +1,76 @@
+id: motion-validation.logic
+version: 1.0
+type: object
+description: Logic for validating motion detection availability and permissions
+appliesTo: motion.state
+rules:
+  - id: validate-secure-context
+    description: Validates that the application is running in a secure context
+    condition: window.isSecureContext === true || window.location.hostname === "localhost"
+    error: "Device Motion API requires a secure context (HTTPS)"
+    guards:
+      - field: window.isSecureContext
+        type: boolean
+      - field: window.location.hostname
+        type: string
+    effects:
+      - validate: isAvailable
+    metadata:
+      createdBy: system
+      tags: [motion, security]
+
+  - id: validate-motion-availability
+    description: Validates motion detection availability
+    condition: isAvailable === true
+    error: "Motion detection is not available"
+    guards:
+      - field: isAvailable
+        type: boolean
+    effects:
+      - validate: isAvailable
+
+  - id: validate-motion-permission
+    description: Validates motion detection permission
+    condition: isAvailable === true && hasPermission === false
+    error: "Motion detection permission required"
+    guards:
+      - field: isAvailable
+        type: boolean
+      - field: hasPermission
+        type: boolean
+    effects:
+      - validate: isAvailable
+      - validate: hasPermission
+
+  - id: validate-motion-error
+    description: Validates motion error state
+    condition: isAvailable === false && hasPermission === false
+    error: "Motion detection error state invalid"
+    guards:
+      - field: isAvailable
+        type: boolean
+      - field: hasPermission
+        type: boolean
+    effects:
+      - validate: isAvailable
+      - validate: hasPermission
+
+  - id: validate-motion-state
+    description: Validates motion detection state consistency
+    condition: !(!isAvailable && hasPermission) && !(!hasPermission && (isAvailable || isMoving))
+    error: "Invalid motion detection state"
+    guards:
+      - field: isAvailable
+        type: boolean
+      - field: hasPermission
+        type: boolean
+      - field: isMoving
+        type: boolean
+    effects:
+      - validate: isAvailable
+      - validate: hasPermission
+      - validate: isMoving
+
+metadata:
+  createdBy: system
+  tags: [motion, validation, security] 

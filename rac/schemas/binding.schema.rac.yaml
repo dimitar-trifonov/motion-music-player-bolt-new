@@ -1,0 +1,33 @@
+id: binding.schema
+version: 1.0
+type: object
+description: Schema for technology-specific RaC bindings
+fields:
+  - name: tech
+    type: string
+    required: true
+    description: Technology stack identifier
+  - name: mappings
+    type: list
+    items:
+      type: object
+      fields:
+        - name: source
+          type: string
+          description: RaC specification path
+        - name: target
+          type: string
+          description: Technology implementation target
+        - name: strategy
+          type: string
+          description: Mapping approach
+  - name: version
+    type: string
+  - name: metadata
+    type: object
+    fields:
+      - name: createdBy
+        type: string
+      - name: tags
+        type: list
+        items: { type: string }

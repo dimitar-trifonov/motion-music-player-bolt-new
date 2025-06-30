@@ -1,0 +1,741 @@
+/* Motion Music Player Design System */
+/* Based on RaC Core UI Structure Binding */
+
+:root {
+  /* Color System - From RaC theme.colors */
+  --color-primary: #3B82F6;
+  --color-primary-dark: #2563EB;
+  --color-secondary: #10B981;
+  --color-background: #FFFFFF;
+  --color-text: #1F2937;
+  --color-text-secondary: #6B7280;
+  --color-error: #EF4444;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  
+  /* Motion State Colors */
+  --color-motion-active: var(--color-success);
+  --color-motion-inactive: var(--color-error);
+  --color-motion-loading: var(--color-warning);
+  
+  /* Typography Scale - From RaC theme.typography */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  
+  /* Spacing Scale - From RaC theme.spacing (8px system) */
+  --space-xs: 0.25rem;  /* 4px */
+  --space-sm: 0.5rem;   /* 8px */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 1.5rem;   /* 24px */
+  --space-xl: 2rem;     /* 32px */
+  --space-2xl: 3rem;    /* 48px */
+  
+  /* Component Specific */
+  --border-radius: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  
+  /* Motion Detection Specific */
+  --motion-indicator-size: 12px;
+  --motion-threshold-track: #E5E7EB;
+  --motion-threshold-thumb: var(--color-primary);
+  
+  /* Card and Border Colors */
+  --color-card-background: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-hover-background: #F9FAFB;
+  --color-active-background: #EBF8FF;
+  --color-track-info-background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  --color-track-info-border: #E2E8F0;
+  --color-debug-background: #F9FAFB;
+  --color-security-warning-background: #FEF3C7;
+  --color-security-warning-border: #F59E0B;
+  --color-security-warning-text: #92400E;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-background: #0F172A;
+  --color-text: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-card-background: #1E293B;
+  --color-border: #334155;
+  --color-border-light: #475569;
+  --color-hover-background: #334155;
+  --color-active-background: #1E40AF;
+  --color-track-info-background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+  --color-track-info-border: #475569;
+  --color-debug-background: #334155;
+  --color-security-warning-background: #451A03;
+  --color-security-warning-border: #D97706;
+  --color-security-warning-text: #FCD34D;
+  --motion-threshold-track: #475569;
+  
+  /* Adjust shadows for dark theme */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+}
+
+/* Auto dark theme based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-background: #0F172A;
+    --color-text: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-card-background: #1E293B;
+    --color-border: #334155;
+    --color-border-light: #475569;
+    --color-hover-background: #334155;
+    --color-active-background: #1E40AF;
+    --color-track-info-background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    --color-track-info-border: #475569;
+    --color-debug-background: #334155;
+    --color-security-warning-background: #451A03;
+    --color-security-warning-border: #D97706;
+    --color-security-warning-text: #FCD34D;
+    --motion-threshold-track: #475569;
+    
+    /* Adjust shadows for dark theme */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-background);
+}
+
+/* Layout Components - From RaC layout.structure */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg);
+  gap: var(--space-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Card Pattern - From RaC components.patterns.card */
+.card {
+  background: var(--color-card-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Button Pattern - From RaC components.patterns.button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #F3F4F6;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-hover-background);
+}
+
+/* Status Indicator Pattern - From RaC components.patterns.status-indicator */
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+}
+
+.status-dot {
+  width: var(--motion-indicator-size);
+  height: var(--motion-indicator-size);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.active {
+  background-color: var(--color-motion-active);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.status-dot.inactive {
+  background-color: var(--color-motion-inactive);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.status-dot.loading {
+  background-color: var(--color-motion-loading);
+  animation: pulse 2s infinite;
+}
+
+/* Slider Pattern - From RaC components.patterns.slider */
+.slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--motion-threshold-track);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--motion-threshold-thumb);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--motion-threshold-thumb);
+  cursor: pointer;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress Bar for Audio */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-border);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  transition: width 0.1s ease;
+}
+
+/* Typography Utilities */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-secondary { color: var(--color-text-secondary); }
+.text-error { color: var(--color-error); }
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+
+/* Spacing Utilities */
+.space-y-xs > * + * { margin-top: var(--space-xs); }
+.space-y-sm > * + * { margin-top: var(--space-sm); }
+.space-y-md > * + * { margin-top: var(--space-md); }
+.space-y-lg > * + * { margin-top: var(--space-lg); }
+
+/* Animation Utilities */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-pulse { animation: pulse 2s infinite; }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* Static rotation utilities for title letters */
+.rotate-3 { transform: rotate(3deg); }
+.rotate-12 { transform: rotate(12deg); }
+.-rotate-6 { transform: rotate(-6deg); }
+
+/* Responsive Design - From RaC layout.responsive */
+@media (max-width: 640px) {
+  .app-container {
+    padding: var(--space-sm);
+    gap: var(--space-md);
+  }
+  
+  .card {
+    padding: var(--space-sm) var(--space-md);
+  }
+  
+  .btn {
+    padding: var(--space-md) var(--space-lg);
+    font-size: var(--text-base);
+  }
+  
+  /* Mobile-specific header adjustments */
+  .card h1 {
+    line-height: 1.2;
+  }
+  
+  /* Ensure text doesn't overflow on very small screens */
+  .card p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Extra small screens (phones in portrait) */
+@media (max-width: 480px) {
+  .app-container {
+    padding: var(--space-xs);
+    gap: var(--space-sm);
+  }
+  
+  .card {
+    padding: var(--space-sm);
+  }
+  
+  .card h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+  
+  .card p {
+    font-size: var(--text-xs);
+  }
+  
+  .btn {
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+  }
+}
+
+/* Motion-specific animations */
+.motion-pulse {
+  animation: motion-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes motion-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* Player control specific styles */
+.player-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-md);
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .player-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Playback controls row - Previous, Play/Pause, Next */
+.playback-controls-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.playback-controls-row .btn {
+  flex: 0 0 auto;
+  min-width: 100px;
+}
+
+.playback-controls-row .btn:nth-child(2) {
+  /* Play/Pause button - make it slightly larger */
+  min-width: 120px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .playback-controls-row {
+    gap: var(--space-sm);
+  }
+  
+  .playback-controls-row .btn {
+    min-width: 80px;
+    font-size: var(--text-xs);
+  }
+  
+  .playback-controls-row .btn:nth-child(2) {
+    min-width: 100px;
+  }
+}
+
+.track-info {
+  text-align: center;
+  padding: var(--space-lg);
+  background: var(--color-track-info-background);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--color-track-info-border);
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Track selection styles */
+.track-list {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+.track-item {
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--color-card-background);
+  color: var(--color-text);
+}
+
+.track-item:hover {
+  background-color: var(--color-hover-background);
+}
+
+.track-item.active {
+  background-color: var(--color-active-background);
+  border-color: #3B82F6;
+  color: var(--color-text);
+}
+
+.track-item:last-child {
+  border-bottom: none;
+}
+
+/* Track selection buttons in PlayerControls - ensure proper dark theme styling */
+.track-selection-button {
+  background-color: var(--color-card-background) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+}
+
+.track-selection-button:hover {
+  background-color: var(--color-hover-background) !important;
+}
+
+.track-selection-button.active {
+  background-color: var(--color-active-background) !important;
+  border-color: #3B82F6 !important;
+  color: var(--color-text) !important;
+}
+
+.track-selection-button .track-title {
+  color: var(--color-text) !important;
+}
+
+.track-selection-button .track-subtitle {
+  color: var(--color-text-secondary) !important;
+}
+/* Dark theme specific overrides */
+[data-theme="dark"] .btn-secondary {
+  background-color: var(--color-border);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-light);
+}
+
+[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-hover-background);
+}
+
+[data-theme="dark"] .track-item {
+  background-color: var(--color-card-background);
+  color: var(--color-text);
+  border-bottom-color: var(--color-border-light);
+}
+
+[data-theme="dark"] .track-item:hover {
+  background-color: var(--color-hover-background);
+}
+
+[data-theme="dark"] .track-item.active {
+  background-color: var(--color-active-background);
+  color: var(--color-text);
+}
+[data-theme="dark"] .track-selection-button {
+  background-color: var(--color-card-background) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .track-selection-button:hover {
+  background-color: var(--color-hover-background) !important;
+}
+
+[data-theme="dark"] .track-selection-button.active {
+  background-color: var(--color-active-background) !important;
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .track-info {
+  background: var(--color-track-info-background);
+  border-color: var(--color-track-info-border);
+  color: var(--color-text);
+}
+
+/* Auto dark theme based on system preference - specific overrides */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .btn-secondary {
+    background-color: var(--color-border);
+    color: var(--color-text);
+    border: 1px solid var(--color-border-light);
+  }
+  
+  :root:not([data-theme]) .btn-secondary:hover:not(:disabled) {
+    background-color: var(--color-hover-background);
+  }
+  
+  :root:not([data-theme]) .track-item {
+    background-color: var(--color-card-background);
+    color: var(--color-text);
+    border-bottom-color: var(--color-border-light);
+  }
+  
+  :root:not([data-theme]) .track-item:hover {
+    background-color: var(--color-hover-background);
+  }
+  
+  :root:not([data-theme]) .track-item.active {
+    background-color: var(--color-active-background);
+    color: var(--color-text);
+  }
+  
+  :root:not([data-theme]) .track-selection-button {
+    background-color: var(--color-card-background) !important;
+    color: var(--color-text) !important;
+    border-color: var(--color-border) !important;
+  }
+  
+  :root:not([data-theme]) .track-selection-button:hover {
+    background-color: var(--color-hover-background) !important;
+  }
+  
+  :root:not([data-theme]) .track-selection-button.active {
+    background-color: var(--color-active-background) !important;
+    color: var(--color-text) !important;
+  }
+
+  :root:not([data-theme]) .track-info {
+    background: var(--color-track-info-background);
+    border-color: var(--color-track-info-border);
+    color: var(--color-text);
+  }
+}
+/* Checkbox styling */
+input[type="checkbox"] {
+  accent-color: var(--color-primary);
+}
+
+/* Loading states */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: inherit;
+}
+
+/* Security warning styles */
+.security-warning {
+  background: var(--color-security-warning-background);
+  border: 1px solid var(--color-security-warning-border);
+  color: var(--color-security-warning-text);
+  padding: var(--space-md);
+  border-radius: var(--border-radius);
+  font-size: var(--text-sm);
+}
+
+/* Bolt.new badge styles */
+.bolt-badge {
+  position: fixed;
+  top: var(--space-lg);
+  right: var(--space-lg);
+  z-index: 1000;
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  background: rgba(0, 0, 0, 0.8);
+  padding: var(--space-sm);
+  border: 1px solid transparent;
+}
+
+.bolt-badge:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.bolt-badge img {
+  display: block;
+  height: 40px;
+  width: auto;
+  border-radius: calc(var(--border-radius) - var(--space-sm));
+}
+
+/* Dark theme - add light border to Bolt.new badge */
+[data-theme="dark"] .bolt-badge {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+[data-theme="dark"] .bolt-badge:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.95);
+}
+
+/* Auto dark theme based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .bolt-badge {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.9);
+  }
+  
+  :root:not([data-theme]) .bolt-badge:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.95);
+  }
+}
+@media (max-width: 640px) {
+  .bolt-badge {
+    top: var(--space-md);
+    right: var(--space-md);
+    padding: var(--space-xs);
+  }
+  
+  .bolt-badge img {
+    height: 32px;
+    border-radius: calc(var(--border-radius) - var(--space-xs));
+  }
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: var(--space-lg);
+  left: var(--space-lg);
+  z-index: 1000;
+  background: var(--color-card-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--space-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 640px) {
+  .theme-toggle {
+    top: var(--space-md);
+    left: var(--space-md);
+    padding: var(--space-xs);
+  }
+}

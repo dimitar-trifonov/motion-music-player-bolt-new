@@ -1,0 +1,40 @@
+id: logic.schema
+version: 1.1
+type: object
+description: Schema for RaC logic definitions. Logic is read-only and cannot mutate state.
+fields:
+  - name: id
+    type: string
+    required: true
+  - name: appliesTo
+    type: string
+  - name: rules
+    type: list
+    items:
+      type: object
+      fields:
+        - name: if
+          type: string
+        - name: then
+          type: list
+          items:
+            type: object
+            fields:
+              - name: error
+                type: string
+  - name: guards
+    type: list
+    items: { type: string }
+  - name: effects
+    type: list
+    items: { type: string }
+  - name: version
+    type: string
+  - name: metadata
+    type: object
+    fields:
+      - name: createdBy
+        type: string
+      - name: tags
+        type: list
+        items: { type: string }

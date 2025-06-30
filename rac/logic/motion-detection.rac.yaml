@@ -1,0 +1,33 @@
+id: motion-detection.logic
+version: 1.0
+type: object
+description: Logic for motion detection system
+appliesTo: motion.state
+rules:
+  - id: validate-motion-history
+    if: "magnitudeHistory.length >= 2"
+    then:
+      - error: "Insufficient motion history for detection"
+  - id: validate-motion-threshold
+    if: "varianceThreshold > 0"
+    then:
+      - error: "Invalid motion threshold"
+  - id: validate-control-mode
+    if: "controlMode in ['manual', 'motion']"
+    then:
+      - error: "Invalid control mode"
+  - id: validate-state-change
+    if: "currentTime - lastStateChange >= 500"
+    then:
+      - error: "State change too soon"
+guards:
+  - magnitudeHistory
+  - varianceThreshold
+  - controlMode
+  - lastStateChange
+effects:
+  - isMoving
+  - lastStateChange
+metadata:
+  createdBy: system
+  tags: [motion, detection, logic] 

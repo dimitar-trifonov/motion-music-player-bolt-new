@@ -1,0 +1,108 @@
+id: event.schema
+version: 1.8
+type: object
+description: Schema for RaC event definitions. Events may declare logic checks and execute actions that mutate state.
+fields:
+  - name: id
+    type: string
+    required: true
+  - name: version
+    type: string
+    required: true
+  - name: type
+    type: enum
+    values: [user, system]
+    required: true
+  - name: description
+    type: string
+    required: true
+  - name: events
+    type: list
+    items:
+      type: object
+      fields:
+        - name: id
+          type: string
+          required: true
+        - name: type
+          type: enum
+          values: [user, system]
+          required: true
+        - name: description
+          type: string
+          required: true
+          description: A clear description of what the event does and when it should be triggered
+        - name: triggers
+          type: list
+          items:
+            type: object
+            fields:
+              - name: source
+                type: object
+                fields:
+                  - name: type
+                    type: enum
+                    values: [user, system, custom]
+                    required: true
+                  - name: name
+                    type: string
+                    required: true
+                    description: Name of the trigger source. Can be any string that describes the source of the event.
+              - name: formId
+                type: string
+              - name: componentId
+                type: string
+              - name: stateId
+                type: string
+              - name: params
+                type: object
+                fields:
+                  - name: threshold
+                    type: number
+                  - name: delay
+                    type: number
+                  - name: errorCode
+                    type: string
+        - name: logicChecks
+          type: list
+          items:
+            type: object
+            fields:
+              - name: type
+                type: enum
+                values: [and, or]
+                required: true
+              - name: checks
+                type: list
+                items:
+                  type: object
+                  fields:
+                    - name: logic
+                      type: string
+                      required: true
+                    - name: onError
+                      type: enum
+                      values: [halt, continue]
+                      default: halt
+        - name: actions
+          type: list
+          items:
+            type: object
+            fields:
+              - name: type
+                type: enum
+                values: [validate, update, create, delete]
+                required: true
+              - name: state
+                type: string
+              - name: fields
+                type: list
+                items: { type: string }
+        - name: metadata
+          type: object
+          fields:
+            - name: createdBy
+              type: string
+            - name: tags
+              type: list
+              items: { type: string }

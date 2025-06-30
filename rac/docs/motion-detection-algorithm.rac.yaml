@@ -1,0 +1,81 @@
+id: motion-detection-algorithm.docs
+version: 1.0
+type: object
+description: Documentation of the motion detection algorithm implementation details
+
+algorithm:
+  id: variance-based-motion-detection
+  description: Algorithm for detecting device motion using variance of acceleration magnitude
+  steps:
+    - id: magnitude-calculation
+      description: Calculate the magnitude of acceleration vector
+      formula: "magnitude = sqrt(x² + y² + z²)"
+      where:
+        - x: acceleration on x-axis
+        - y: acceleration on y-axis
+        - z: acceleration on z-axis
+
+    - id: history-management
+      description: Maintain a fixed-size history of magnitude values
+      properties:
+        - size: "Number of recent magnitude values to store"
+        - purpose: "Enable variance calculation over time window"
+        - update: "Add new magnitude, remove oldest if size exceeded"
+
+    - id: variance-calculation
+      description: Calculate variance of magnitude values in history
+      formula: "variance = Σ(x - μ)² / n"
+      where:
+        - x: each magnitude value in history
+        - μ: mean of magnitude values
+        - n: number of values in history
+      purpose: "Measure of how spread out the magnitude values are"
+
+    - id: motion-determination
+      description: Determine if device is moving based on variance
+      logic: "if variance > threshold then device is moving"
+      properties:
+        - threshold: "Minimum variance value to consider device moving"
+        - purpose: "Distinguish between intentional movement and noise"
+
+    - id: state-debouncing
+      description: Prevent rapid state changes
+      properties:
+        - delay: "Minimum time between state changes"
+        - purpose: "Ensure stable motion detection"
+
+sensitivity:
+  id: sensitivity-adjustment
+  description: Mechanism for adjusting motion detection sensitivity
+  properties:
+    - name: sensitivity-range
+      range: "0-100"
+      purpose: "User-defined sensitivity value"
+    - name: threshold-scaling
+      formula: "adjustedThreshold = baseThreshold * (1 - sensitivity/100)"
+      where:
+        - sensitivity: "User-defined sensitivity value (0-100)"
+        - baseThreshold: "Default motion detection threshold"
+      purpose: "Adjust motion detection threshold based on sensitivity"
+
+validation:
+  id: motion-validation-rules
+  description: Validation rules for motion detection
+  rules:
+    - id: history-validation
+      rule: "magnitudeHistory.length >= 2"
+      purpose: "Ensure sufficient data for variance"
+    - id: threshold-validation
+      rule: "varianceThreshold > 0"
+      purpose: "Ensure valid detection threshold"
+    - id: state-change-validation
+      rule: "currentTime - lastStateChange >= delay"
+      purpose: "Enforce debouncing"
+    - id: sensitivity-validation
+      rule: "sensitivity >= 0 && sensitivity <= 100"
+      purpose: "Ensure sensitivity is within valid range"
+
+metadata:
+  createdBy: system
+  tags: [motion, detection, algorithm, documentation]
+  notes: "This document describes the implementation details of the motion detection algorithm, including sensitivity adjustment and validation rules" 

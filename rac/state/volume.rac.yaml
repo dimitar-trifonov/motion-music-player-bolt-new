@@ -1,0 +1,15 @@
+id: volume.state
+version: 1.0
+type: object
+description: Volume control state
+fields:
+  - name: level
+    type: number
+    required: true
+    description: Current volume level (0-1)
+access:
+  read: public
+  write: user-control
+metadata:
+  createdBy: system
+  tags: [volume, audio] 

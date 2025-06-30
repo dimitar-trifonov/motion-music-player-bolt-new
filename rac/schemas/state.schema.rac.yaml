@@ -1,0 +1,43 @@
+id: state.schema
+version: 1.0
+type: object
+description: Schema for RaC state definitions
+fields:
+  - name: id
+    type: string
+    required: true
+  - name: type
+    type: enum
+    values: [object, array, primitive]
+    required: true
+  - name: fields
+    type: list
+    items:
+      type: object
+      fields:
+        - name: name
+          type: string
+        - name: type
+          type: string
+        - name: required
+          type: boolean
+          default: false
+        - name: format
+          type: string
+  - name: access
+    type: object
+    fields:
+      - name: read
+        type: string
+      - name: write
+        type: string
+  - name: version
+    type: string
+  - name: metadata
+    type: object
+    fields:
+      - name: createdBy
+        type: string
+      - name: tags
+        type: list
+        items: { type: string }

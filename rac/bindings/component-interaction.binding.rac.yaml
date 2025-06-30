@@ -1,0 +1,143 @@
+id: component-interaction
+version: 1.0
+type: binding
+tech: react
+description: Component Interaction binding for the motion-controlled music player
+
+metadata:
+  createdBy: RaC
+  tags:
+    - state
+    - events
+    - communication
+    - data-flow
+
+mappings:
+  - source: communication.patterns
+    target: react.communication
+    strategy: component-patterns
+
+  - source: state.patterns
+    target: react.state
+    strategy: state-management
+
+  - source: events.patterns
+    target: react.events
+    strategy: event-handling
+
+  - source: data.patterns
+    target: react.data
+    strategy: data-flow
+
+  # Motion Sensitivity (Threshold) Binding
+  - source: motion.state.motionThreshold
+    target: react.state.motionThreshold
+    description: Binds the motion sensitivity (threshold) value to the React state for UI slider control.
+    pattern: data
+    updateEvent: update-motion-threshold
+    direction: bidirectional
+
+communication:
+  patterns:
+    - name: parent-child
+      flow: unidirectional
+      rules:
+        - props: down
+        - events: up
+        - state: local
+
+    - name: sibling
+      flow: through-parent
+      rules:
+        - state: lifted
+        - events: bubbled
+
+    - name: global
+      flow: context
+      rules:
+        - state: shared
+        - updates: propagated
+
+state:
+  patterns:
+    - name: local
+      scope: component
+      rules:
+        - updates: internal
+        - persistence: none
+        - sharing: props
+
+    - name: shared
+      scope: context
+      rules:
+        - updates: propagated
+        - persistence: session
+        - sharing: direct
+        - fields:
+            - autoAdvance:
+                type: boolean
+                default: true
+                description: Whether to automatically advance to the next track
+                updateEvent: toggle-auto-advance
+
+    - name: global
+      scope: application
+      rules:
+        - updates: broadcast
+        - persistence: local
+        - sharing: context
+
+events:
+  patterns:
+    - name: user
+      types:
+        - click
+        - input
+        - change
+      rules:
+        - propagation: bubble
+        - handling: direct
+        - cleanup: automatic
+
+    - name: system
+      types:
+        - mount
+        - unmount
+        - error
+      rules:
+        - propagation: capture
+        - handling: lifecycle
+        - cleanup: manual
+
+    - name: custom
+      types:
+        - state-change
+        - motion-detection
+        - audio-control
+      rules:
+        - propagation: bubble
+        - handling: registered
+        - cleanup: manual
+
+data:
+  patterns:
+    - name: props
+      flow: down
+      rules:
+        - validation: required
+        - updates: parent
+        - types: strict
+
+    - name: state
+      flow: internal
+      rules:
+        - validation: optional
+        - updates: local
+        - types: strict
+
+    - name: context
+      flow: any
+      rules:
+        - validation: required
+        - updates: provider
+        - types: strict 

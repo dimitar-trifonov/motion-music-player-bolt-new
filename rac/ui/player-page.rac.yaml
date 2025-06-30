@@ -1,0 +1,55 @@
+id: player-page
+version: 1.1
+type: component
+description: Main player page that combines motion status, player status, and player controls in a single layout
+
+components:
+  motionStatus:
+    type: component
+    fields:
+      - permissionStatus
+      - availabilityStatus
+      - motionState
+    submitEvent: check-motion-availability
+    bindsTo: motion-status
+
+  playerStatus:
+    type: component
+    fields:
+      - currentTrack
+      - playbackState
+      - isLoading
+      - error
+    submitEvent: update-player-status
+    bindsTo: player-status
+
+  playerControls:
+    type: component
+    fields:
+      - controlMode
+      - playbackState
+      - volume
+      - currentTime
+      - duration
+      - isLoading
+      - error
+    submitEvent: update-player-controls
+    bindsTo: player-controls
+
+views:
+  path: /player
+  layout:
+    type: container
+    children:
+      - motionStatus
+      - playerStatus
+      - playerControls
+
+metadata:
+  createdBy: system
+  tags:
+    - player
+    - ui
+    - layout
+    - motion
+    - playback 

@@ -1,0 +1,106 @@
+id: motion-status.test
+version: 1.1
+description: Tests for motion status component
+
+setup:
+  device:
+    supportsMotion: true
+
+testCases:
+  - id: availability-check-supported-device
+    description: Test motion detection availability on supported device
+    setup:
+      device:
+        supportsMotion: true
+    input:
+      event: mount
+      data:
+        component: motion-status
+    expected:
+      text: "Motion detection: Permission required"
+      buttonVisible: true
+      indicatorState: "available"
+    notes: Verifies correct UI state when device supports motion detection
+
+  - id: availability-check-unsupported-device
+    description: Test motion detection availability on unsupported device
+    setup:
+      device:
+        supportsMotion: false
+    input:
+      event: mount
+      data:
+        component: motion-status
+    expected:
+      text: "Motion detection: Not available"
+      buttonVisible: false
+      indicatorState: "not-available"
+    notes: Verifies correct UI state when device doesn't support motion detection
+
+  - id: permission-flow-granted
+    description: Test permission flow when permission is granted
+    setup:
+      device:
+        supportsMotion: true
+    input:
+      event: click
+      data:
+        target: permission-button
+    expected:
+      text: "Motion detection: Ready"
+      buttonVisible: false
+      indicatorState: "available"
+    notes: Verifies UI state after permission is granted
+
+  - id: permission-flow-denied
+    description: Test permission flow when permission is denied
+    setup:
+      device:
+        supportsMotion: true
+    input:
+      event: click
+      data:
+        target: permission-button
+    expected:
+      text: "Motion detection: Permission required"
+      buttonVisible: true
+      indicatorState: "not-available"
+    notes: Verifies UI state after permission is denied
+
+  - id: component-mount
+    description: Test component mount behavior
+    setup:
+      device:
+        supportsMotion: true
+    input:
+      event: mount
+      data:
+        component: motion-status
+    expected:
+      availabilityCheckTriggered: true
+      initialState: "denied"
+      buttonVisible: true
+      textVisible: true
+      indicatorVisible: true
+    notes: Verifies initial component state and UI elements
+
+  - id: error-handling
+    description: Test error handling scenarios
+    setup:
+      device:
+        supportsMotion: true
+        throwError: true
+    input:
+      event: mount
+      data:
+        component: motion-status
+    expected:
+      text: "Motion detection: Error checking availability"
+      buttonVisible: false
+      indicatorState: "error"
+    expectError: "Failed to check motion detection availability"
+    notes: Verifies error handling and UI state during errors
+
+metadata:
+  createdBy: system
+  tags: [test, motion, ui] 

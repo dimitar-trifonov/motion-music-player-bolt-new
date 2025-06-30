@@ -1,0 +1,64 @@
+id: motion-detection.test
+version: 1.0
+description: Tests for motion detection threshold (sensitivity) logic
+
+testCases:
+  - id: test-threshold-valid-range
+    description: Should accept threshold values within 0-100
+    setup:
+      motion.state:
+        motionThreshold: 50
+    trigger:
+      event: update-motion-threshold
+      value: 75
+    expect:
+      motion.state.motionThreshold: 75
+      noError: true
+
+  - id: test-threshold-below-min
+    description: Should reject threshold values below 0
+    setup:
+      motion.state:
+        motionThreshold: 10
+    trigger:
+      event: update-motion-threshold
+      value: -5
+    expect:
+      error: "Motion sensitivity (threshold) must be between 0 and 100."
+      motion.state.motionThreshold: 10
+
+  - id: test-threshold-above-max
+    description: Should reject threshold values above 100
+    setup:
+      motion.state:
+        motionThreshold: 90
+    trigger:
+      event: update-motion-threshold
+      value: 120
+    expect:
+      error: "Motion sensitivity (threshold) must be between 0 and 100."
+      motion.state.motionThreshold: 90
+
+  - id: test-threshold-at-min
+    description: Should accept threshold value at minimum (0)
+    setup:
+      motion.state:
+        motionThreshold: 10
+    trigger:
+      event: update-motion-threshold
+      value: 0
+    expect:
+      motion.state.motionThreshold: 0
+      noError: true
+
+  - id: test-threshold-at-max
+    description: Should accept threshold value at maximum (100)
+    setup:
+      motion.state:
+        motionThreshold: 10
+    trigger:
+      event: update-motion-threshold
+      value: 100
+    expect:
+      motion.state.motionThreshold: 100
+      noError: true 

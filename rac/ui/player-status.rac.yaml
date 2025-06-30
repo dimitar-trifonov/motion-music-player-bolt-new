@@ -1,0 +1,59 @@
+id: player-status
+version: 1.1
+description: |
+  Player status display component.
+  Shows current track information, playback state, and loading status.
+  Updates in real-time based on player state changes.
+
+components:
+  - type: container
+    fields:
+      - name: onMount
+        type: function
+        description: Initializes player status display
+      - name: currentTrack
+        type: object
+        description: Current track information from playlist state
+      - name: playbackState
+        type: object
+        description: Current playback state from player state
+    submitEvent: player-status-mount
+
+  - type: text
+    fields:
+      - name: title
+        type: string
+        description: Current track title
+      - name: artist
+        type: string
+        description: Current track artist
+    submitEvent: track-info-update
+
+  - type: indicator
+    fields:
+      - name: state
+        type: enum
+        values: [playing, paused]
+        description: Current playback state
+      - name: color
+        type: string
+        description: Color indicator for current state
+    submitEvent: playback-state-update
+
+  - type: indicator
+    fields:
+      - name: state
+        type: string
+        description: Current loading state (loading/loaded/error)
+      - name: color
+        type: string
+        description: Color indicator for loading state
+    submitEvent: loading-state-update
+
+views:
+  - path: /
+    layout: main
+
+metadata:
+  createdBy: system
+  tags: [player, ui, component] 
